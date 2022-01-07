@@ -1,0 +1,367 @@
+Entendendo o que é Git e GitHub(Microsoft) e sua importância:
+
+- Git é uma plataforma para versionamento de código distribuído, criado em 2005 por Linus Torvald (um dos criadores do Linux).
+- Git e GitHub são diferentes (o Git é open e o GitHub pode ter versão paga).
+- MarkDown é uma linguagem de formatação que pode ser utilizada dentro do Git. (Para aprofundar www.markdownguide.org/basic-syntax/)
+
+Principais benefícios do Git e GitHub:
+
+- Controle de versão.
+- Armazenamento em nuvem.
+- Trabalho em equipe.
+- Melhorar seu código.
+- Reconhecimento.
+
+O GitHub funciona como uma espécie de rede social. 
+
+Navegação via command line interface e instalação:
+
+- O Git é um CLI (Command Line Interface).
+- O Git não tem uma interface gráfica.
+- A forma de interação com o Git é por linha de comando.
+- Instalando o Windows para Linux: abri o cmd como administrador e executar o comando wsl.exe --install
+- Equivalência comandos Windows e Linux:
+  Windows                          Linux
+  - cd                             - cd
+  - dir                            - ls
+  - mkdir                          - mkdir
+  - del / rmdir                    - rm -rf
+  - cls                            - clear (ctrl + L)               
+  - cd w + Tab (autocompleta) 
+                                   - sudo su (pega permissão para criar pastas no linux)
+  - echo hello > hello.txt         - echo hello > hello.txt
+  - mkdir workspace                - mkdir workspace
+  - del workspace (deleta se não existir arquivo dentro da pasta)          
+  - rmdir workspace /S /Q (deleta) - rm -rf workspace/ (-rf r->recursivo f->force)
+  
+Realizando a Instalação do GIT:
+
+- Baixar o instalador do site do GIT na Web (Windows e Linux (WSL)).
+
+Tópicos fundamentais para entender o funcionamento do Git
+
+- A sigla SHA significa Secure Hash Algorithm (Algoritimo de Hash Seguro), é um conjunto de funções hash criptográficas projetadas pela
+  NSA (Agência de Segurança Nacional dos EUA).
+  
+- A encriptação gera conjunto de caracteres identificador de 40 dígitos.
+
+- É uma forma curta de representar um arquivo.
+
+Objetos Internos do Git
+
+- BLOBS (bolha)
+- TREES
+- COMMITS
+
+Entendendo o objeto Blobs ou bolha (contém metadados do Git: tipo, tamanho, \0, conteúdo):
+
+- O Blob não guarda o nome do arquivo.
+- O Blob guarda o sha1 que é o são seus caracteres identificadores.
+
+Andrey@LAPTOP-7TO7IPNO MINGW64 ~/Desktop/Curso Spread - DIO
+$ echo 'conteudo' | git hash-object --stdin
+fc31e91b26cf85a55e072476de7f263c89260eb1 <==
+
+Obs: o exemplo acima o retorno foi de uma string hash de 40 caracteres encriptada utilizando a função hash do Git e a encriptação sha1.
+     nessa estrutura a string é guardada dentro de um objeto do Git tipo blob que tem a seguinte estrutura: 
+     1 - Tipo do objeto, nesse caso Blob
+     2 - O tamanho da string ou do arquivo
+     3 - Uma barra contrária mais o 0 (zero): \0
+     4 - O conteúdo do arquivo (texto, binário, etc);
+
+Andrey@LAPTOP-7TO7IPNO MINGW64 ~/Desktop/Curso Spread - DIO
+$ echo -e 'conteudo' | openssl sha1
+(stdin)= 65b0d0dda479cc03cce59528e28961e498155f5c
+
+Obs: o exemplo acima foi usado o comando openssl usando o sha1 para encriptar a string 'conteudo'.
+     observa-se que foi gerado um outro tipo de caracter, isso porque no git os arquivos ficam guardados dentro do objeto Blob que tem 
+     a estrutura acima definida. Esse objeto Blob contém metadados dentro dele que é a estrutura acima. Por isso foi retornada uma string
+     diferente.
+     Porém, se na utilização do comando openssl for informada a string a ser encriptada contendo a estrutura do objeto Blob a string retornada
+     será a mesma conforme o exemplo abaixo:
+     
+Andrey@LAPTOP-7TO7IPNO MINGW64 ~/Desktop/Curso Spread - DIO
+$ echo -e 'blob 9\0conteudo' | openssl sha1
+(stdin)= fc31e91b26cf85a55e072476de7f263c89260eb1 <==
+
+Entendendo o objeto Tree (arvore):
+
+- O objeto tipo Tree armazena objetos tipo Blob.
+- A tree contém metadados e aponta para um Blob.
+- A tree tem um sha1.
+- A tree guarda o nome do arquivo.
+- A tree é responsável por montar toda a estrutura onde estão localizados os arquivos.
+- A tree pode apontar para outras trees ou blobs.
+- A tree é um tipo de objeto recursivo que permite uma tree apontar para outra tree.
+- A tree tem um sha1 do metadado.
+
+Entendendo o objeto Commit:
+
+- O commit é o objeto que junta tudo, que dá sentido a alteração que está sendo feita.
+- O commit aponta para uma árvore.
+- O commit aponta para um parente, ou seja, o último commit realizado antes dele.
+- O commit aponta para um autor.
+- O commit aponta para uma mensagem informada pelo autor que dá significado aos arquivos dentro das pastas que estão sendo comitadas.
+- O commit tem um timestamp ou carimbo de tempo contendo a data e hora de quando ele foi criado.
+- O commit também possui um sha1 de encriptação.
+
+Se for alterado um Blob, será gerado um novo hash de encriptação (sha1), por consequencia será gerado também um novo hash de encriptação da Tree onde o objeto
+Blob está contido (essa tree aponta para o blob alterado) e como o commit aponta para a Tree que por sua vez pode apontar também para outras Trees será gerado
+também um novo hash de encriptação para o objeto Commit. 
+
+Esse processo garante a integridade dos versionamentos feitos no Git permitindo montar uma linha do tempo dos commits realizados.
+
+O arquivos representados pelos objetos Blob estão contidos dentre de objetos do tipo Tree que por sua vez estão contidos no objeto tipo Commit.
+
+O Git é um sistema distribuído seguro. Imagine que tenhamos nosso código, nosso repositório roteado em um servidor na nuvem, por exemplo. Esse código representa
+o estado final do nosso código ou software, a versão mais recente, mais atualizada. Como o código pode ser trabalhado por vários colaboradores, no caso de ocorrer
+um problema no servidor o código estará seguro em outro servidor.   
+
+CHAVES SSH E TOKEN
+
+- Para se salvar algo no Git é necessária uma autenticação para que o Git nos identifique.
+
+Chave SSH
+
+- É uma forma de se obter uma conexão segura e encriptada entre duas máquinas.
+- Se conecta no GitHub e configura a máquina local como uma máquina confiável.
+- Serão necessárias duas chaves: uma pública e uma privada.
+- A chave pública será colocada no GitHub.
+- A partir disso o GitHub irá conhecer a máquina não sendo necessária nova autenticação para envio ou clonagem de código.
+- Para configurar a chave pública seguir os passos:
+	- Ir na página do GitHub e acessar sua conta.
+	- Dentro da plataforma do GitHub ir no ícone da imagem e selecionar o item de Menu => Definições (Settings).
+	- Selecionar no Menu Configurações da Conta a opção: Chaves SSH e GPG (SSH and GPG Keys).
+	- Selecionar a opção "Nova chave SSH" (New SSH Key)
+	- Abre o Git Bash.
+	- Usa a sequência de comandos abaixo no terminal bash para criar as chaves:
+		- ssh-keygen -t ed25519 -C amdprocessamento@gmail.com
+		- É solicitado um local para armazenar as chaves (recomenda-se mander o local sugerido somente teclando Enter)
+		- É solicitado informar uma senha
+		- É informado o local onde foram geradas as chaves pública e privada
+		- É informado o tipo e o nome da criptografia utilizada para gerar as chaves
+		
+			Andrey@LAPTOP-7TO7IPNO MINGW64 ~
+			$ ssh-keygen -t ed25519 -C amdprocessamento@gmail.com
+			Generating public/private ed25519 key pair.
+			Enter file in which to save the key (/c/Users/Andrey/.ssh/id_ed25519):
+			Created directory '/c/Users/Andrey/.ssh'.
+			Enter passphrase (empty for no passphrase):
+			Enter same passphrase again:
+			Your identification has been saved in /c/Users/Andrey/.ssh/id_ed25519
+			Your public key has been saved in /c/Users/Andrey/.ssh/id_ed25519.pub
+			The key fingerprint is:
+			SHA256:Youp0f1RrKiCqMFvUCXJYma+Ce5efRYTcuaLt0HT5c0 amdprocessamento@gmail.com
+			The key's randomart image is:
+			+--[ED25519 256]--+
+			|  . .            |
+			| = + .           |
+			|= . o. +   .     |
+			|.. .  = o.o o    |
+			|o +   o*S.o. E   |
+			|.= ..=o+=o       |
+			|+oo.+o+*o        |
+			|oo++ .+.o.       |
+			|+.oo.  ..        |
+			+----[SHA256]-----+
+		
+		- Muda para o local onde foram armazenadas as chaves: cd /c/Users/Andrey/.ssh/
+		- Lista as pastas com o comando: ls
+		- Exibe o conteúdo do arquivo com a chave pública: cat id_ed25519.pub
+		- Copia a chave publica que vai se utilizada no GitHub
+		- Vai na plataforma GitHub
+		- Informa um nome para a chave SSH: Ex: Minha máquina Windows
+		- Se for solicitado autenticar na plataforma
+		- É gerada uma nova chave SSH com o alias ou nome informado
+		- Vai no terminal bash e digita o comando pwd para ver o caminho completo
+		- Inicializa o SSH Agente responsável por pegar as chaves e lidar com elas com o comando abaixo:
+			- eval $(ssh-agent -s)
+		- É inicalizado um processo para rodar o SSH Agent
+		
+			$ eval $(ssh-agent -s)
+			Agent pid 687
+		
+		- Entrega a chave privada para o SSH Agent com o comando abaixo:
+			- ssh-add id_ed25519
+			- Informa a senha utilizada no passo anterior acima
+			- A chave é adicionada ao SSH Agent
+			
+			$ ssh-add id_ed25519
+			Enter passphrase for id_ed25519:
+			Identity added: id_ed25519 (amdprocessamento@gmail.com)
+			
+		- Para clonar um repositório com SSH configurado tem que utilizar o link SSH no repositório, no exemplo vou clonar o repositório AndreyMDeus/aulajpa
+			- Clica no dropdown do botão "Código" e em "Clone" clica em "SSH" e copia a url
+			- link SSH do repositório: git@github.com:AndreyMDeus/aulajpa.git
+
+			Andrey@LAPTOP-7TO7IPNO MINGW64 ~/workspace/ssh-test
+			$ git clone git@github.com:AndreyMDeus/aulajpa.git
+			Cloning into 'aulajpa'...
+			The authenticity of host 'github.com (20.201.28.151)' can't be established.
+			ED25519 key fingerprint is SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+			This key is not known by any other names
+			Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+			Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
+			remote: Enumerating objects: 32, done.
+			remote: Total 32 (delta 0), reused 0 (delta 0), pack-reused 32
+			Receiving objects: 100% (32/32), 9.48 MiB | 136.00 KiB/s, done.
+			
+			Andrey@LAPTOP-7TO7IPNO MINGW64 ~/workspace/ssh-test
+			$ ls
+			aulajpa/
+
+		- Para utilização no Linux o processo é o mesmo utilizado no Windows
+		
+- A partir disso o Git já identifica a máquina quando no envio de código não sendo necessária nova autenticação.
+
+- A segunda forma de autenticação que o Git oferece são os Tokens de Acesso Pessoal
+- Tem um ínicio bem parecido, vai no Git gerar ele, mas se assemelha mais ao processo de digitar o nome e senha do que a vantagem que o SSH tem de não ter que
+  informar nada
+- O processo gera um token no GitHub e guarda na máquina local em algum lugar e sempre que for fazer um commit o Git vai pedir o seu usuário e na hora da senha
+  vai informar o token pessoal 
+- É preferível configurar uma chave SSH
+- Para gerar o Token Pessoal segue os passos:
+	- Na plataforma GitHub em "Configurações da Conta" selecione "Configurações do Desenvolvedor"
+	- Na próxima página selecione "Tokens de acesso pessoal"
+	- Selecione o botão "Gerar novo token"
+	- Informe se solicitado a senha da plataforma do GitHub
+	- Se quiser coloque uma observação sobre o token
+	- Informe um vencimento para o token
+	- Se for mexer nas coisas padrão do Git marque a opção "repo" na seleção de escopos
+	- Selecione "Gerar token"
+	- Copie o token gerado e salve em algum arquivo no computador porque não será possível vê-lo novamente, nesse caso o token gerado foi esse:
+		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
+	- Para clonar o repositório utilizando o Token pessoal vá ao repositório
+	- Selecione o botão "Código"
+	- Selecione HTTPS
+	- Copie a url
+	- Abra o terminal Bash
+	- Digite o comando: git clone https://github.com/AndreyMDeus/aulajpa.git
+	- Na tela de autenticação informe o toke gerado
+	
+		Andrey@LAPTOP-7TO7IPNO MINGW64 ~/workspace/token-test
+		$ git clone https://github.com/AndreyMDeus/aulajpa.git
+		Cloning into 'aulajpa'...
+		remote: Enumerating objects: 32, done.
+		remote: Total 32 (delta 0), reused 0 (delta 0), pack-reused 32
+		Receiving objects: 100% (32/32), 9.48 MiB | 218.00 KiB/s, done.
+
+Iniciando o Git e criando um commit
+
+	- Iniciar o Git				(git init)
+	- Iniciar o versionamento	(git add)
+	- Criar um commit			(git commit)
+	
+	- O comando git init inicializa um repositório vazio na pasta atual
+	- O comando ls -a lista também as pastas ocultas no diretório atual
+	- Na primeira vez que estiver utilizando o Git ele irá solicitar um user name e um email
+	- O Git requer muito poucas configurações que são as abaixo:
+		- git config --global user.email "amdprocessamento@gmail"
+		- git config --global user.name Andrey
+	- Para adicionar os arquivos ao repositório do Git digite: git add * ou git add . ou git add nomeArquivo
+	- Depois é necessário dar o commit para salvar os arquivos no repositório: git commit -m "Comentário sobre o versionamento"
+	
+Passo a passo no ciclo de vida no Git
+
+	- Git Init   => Inicializa o repositório na pasta atual
+	- Git Add    => Adiciona os arquivos criados/modificados no repositório
+	- Git Commit => Salva os arquivos no repositório
+	
+	- Internamente no Git os arquivos manipulados mudam de estado Unmodified para Modified
+	- No estado Untracked, quando um arquivo não é manipulado e é excluído, o Git não toma ciência dele
+	- Quando executa o comando Git Add novamente, os arquivos que estiverem no estado Modified mudam para o estado Staged
+	- Os arquivos no estado Staged estão prontos para serem comitados no repositório, é uma área especial aguardando alguma ação no Git
+	- Após o commit o Git retorna o estado de todos os arquivos para UnModified para iniciar o ciclo novamente
+	- Abaixo está representado o ciclo no Git:
+		Untracked ==> Unmodified ==> Modified ==> Staged
+	- O comando Git Status mostra o status dos arquivos
+	- O comando mv nome_arquivo ./diretorio/ => move o arquivo para o diretório informado
+	- O atalho Ctrl + L limpa a tela do terminal Bash
+	- O Git Add pode ser usado:
+			Git Add nomeArquivo
+			Git Add *
+			Git Add .
+
+Trabalhando com o GitHub
+
+	- Para ver a configuração do Git:
+		- git config --list
+	
+			Andrey@LAPTOP-7TO7IPNO MINGW64 /c/Trabalho/Asp/MSEDITORIAIS (master)
+			$ git config --list
+			diff.astextplain.textconv=astextplain
+			filter.lfs.clean=git-lfs clean -- %f
+			filter.lfs.smudge=git-lfs smudge -- %f
+			filter.lfs.process=git-lfs filter-process
+			filter.lfs.required=true
+			http.sslbackend=openssl
+			http.sslcainfo=C:/Program Files/Git/mingw64/ssl/certs/ca-bundle.crt
+			core.autocrlf=true
+			core.fscache=true
+			core.symlinks=false
+			pull.rebase=false
+			credential.helper=manager-core
+			credential.https://dev.azure.com.usehttppath=true
+			init.defaultbranch=master
+			user.name=Andrey Martins
+			user.email=amdprocessamento@gmail.com
+			core.repositoryformatversion=0
+			core.filemode=false
+			core.bare=false
+			core.logallrefupdates=true
+			core.symlinks=false
+			core.ignorecase=true
+
+	- Para alterar a configuração no Git:
+		- git config --global --unset user.email
+		- git config --global --unset user.name
+		
+	- Para configurar os atributos no Git:
+		- git config --global user.email "amdprocessamento@gmail"
+		- git config --global user.name "Andrey Martins"
+		
+	- Para apontar o repositório local para o repositório do GitHub:
+		- Abre o terminal Bash
+		- Na plataforma do GitHub copia a url do repositório criado na plataforma: https://github.com/AndreyMDeus/MsEditoriais.git
+		- No terminal Bash executa o comando:
+			- git remote add origin https://github.com/AndreyMDeus/MsEditoriais.git
+			- git branch -M main
+			
+	- Para enviar os arquivos do repositório para o GitHub:
+		- git push -u origin main
+		
+			Andrey@LAPTOP-7TO7IPNO MINGW64 /c/Trabalho/Asp/MSEDITORIAIS (main)
+			$ git push -u origin main
+			Enumerating objects: 613, done.
+			Counting objects: 100% (613/613), done.
+			Delta compression using up to 8 threads
+			Compressing objects: 100% (592/592), done.
+			Writing objects: 100% (613/613), 3.33 MiB | 1.00 MiB/s, done.
+			Total 613 (delta 136), reused 0 (delta 0), pack-reused 0
+			remote: Resolving deltas: 100% (136/136), done.
+			To https://github.com/AndreyMDeus/MsEditoriais.git
+			 * [new branch]      main -> main
+			Branch 'main' set up to track remote branch 'main' from 'origin'.
+
+Resolvendo Conflitos no GitHub
+
+Quando se envia o código para o GitHub ou se baixa o código ele é exatamente o mesmo nos dois ambientes (GitHub e máquina local)
+
+O versionamento de código é feito de forma distribuída, a versão que está no repositório da máquina local corresponde exatamente a versão que está
+no repositório do GitHub sendo distribuída pelo GitHub
+
+O Git Clone é pegar o repositório que está no GitHub e cloná-lo para a máquina local, significa que o repositório está sendo pego para ser feita uma 
+contribuição
+
+Quando é feita uma edição por várias pessoas o problema do conflito ocorre principalmente quando uma mesma linha é editada por várias pessoas
+
+O conflito de merge ocorre quando se tentar juntar várias alterações e uma delas está na mesma linha de vários códigos, quando isso ocorre o conflito 
+tem que ser resolvido manualmente e depois é feita a atualização no GitHub
+
+	- Para puxar o arquivo que está no GitHub quando há um conflito de versão usá-se o comando "GIT PULL"
+		- git pull origin main (ou master)
+
+Após resolver o conflito tem que adicionar novamente ao repositório
+
+
+
